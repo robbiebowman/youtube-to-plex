@@ -11,7 +11,7 @@ Automatically download videos from YouTube channels and organize them for Plex w
 
 2. **Get YouTube API key**
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a project and enable YouTube Data API v3
+   - Create a project and enable [YouTube Data API v3](https://console.cloud.google.com/marketplace/product/google/youtube.googleapis.com)
    - Create credentials (API key)
 
 3. **Configure environment**
