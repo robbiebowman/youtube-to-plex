@@ -1,0 +1,11 @@
+yt-dlp>=2023.12.30
+PyYAML>=6.0.1
+fuzzywuzzy>=0.18.0
+python-levenshtein>=0.21.1
+google-api-python-client>=2.100.0
+google-auth-httplib2>=0.2.0
+google-auth-oauthlib>=1.0.0
+schedule>=1.2.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+feedparser>=6.0.10

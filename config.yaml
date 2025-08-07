@@ -1,0 +1,34 @@
+youtube:
+  api_key: "${YOUTUBE_API_KEY}"
+  channel_url: "https://www.youtube.com/@CosmicPumpkin"
+  quota_limit: 10000
+
+filters:
+  upload_window_days: 90
+  title_patterns: []
+  min_duration_minutes: null
+  max_duration_minutes: null
+  exclude_keywords: []
+
+download:
+  quality: "best[height<=1080][vcodec^=avc1]+bestaudio[acodec^=mp4a]/best[height<=1080]"
+  output_path: "~/tv-shows/%(uploader)s/Season %(season)s/%(title)s.%(ext)s"
+  audio_only: false
+  subtitle_languages: ["en", "en-US"]
+
+storage:
+  base_directory: "~/tv-shows"
+  organize_by_season: true
+  generate_metadata: true
+  cleanup_partial_downloads: true
+
+schedule:
+  enabled: true
+  cron_expression: "0 18 * * 1"
+  timezone: "America/New_York"
+
+logging:
+  level: "INFO"
+  file_path: "logs/youtube-downloader.log"
+  max_file_size_mb: 10
+  backup_count: 5
