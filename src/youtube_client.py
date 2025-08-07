@@ -104,6 +104,11 @@ class YouTubeClient(LoggerMixin):
     
     def _extract_channel_id_from_url(self, url: str) -> Optional[str]:
         """Extract channel ID from various YouTube URL formats."""
+        # Handle bare @username format (not a full URL)
+        if url.startswith('@'):
+            username = url[1:]  # Remove @
+            return self._get_channel_id_by_search(username)
+        
         parsed = urlparse(url)
         
         # Handle @username format: https://www.youtube.com/@username

@@ -55,14 +55,18 @@ class PlexNamingHelper:
     @staticmethod
     def extract_episode_info(title: str) -> Tuple[Optional[str], Optional[int], Optional[int]]:
         """Extract series name, season, and episode from title."""
-        # Common patterns for episode identification
+        # Common patterns for episode identification (order matters!)
         patterns = [
-            # "Series S01E05" or "Series S1E5"
+            # "Series S01E05" or "Series S1E5" - must come first
             r'(.+?)\s+S(\d+)E(\d+)',
             # "Series Season 1 Episode 5"
             r'(.+?)\s+Season\s+(\d+)\s+Episode\s+(\d+)',
             # "Series 1x05"
             r'(.+?)\s+(\d+)x(\d+)',
+            # "Series Series 21 Episode 3" or "Program Series 54 Episode 37"
+            r'(.+?)\s+Series\s+(\d+)\s+Episode\s+(\d+)',
+            # "Series - Series 15 - Episode 2"
+            r'(.+?)\s+-\s+Series\s+(\d+)\s+-\s+Episode\s+(\d+)',
             # "Series - Episode 5" (assume Season 1)
             r'(.+?)\s+-\s+Episode\s+(\d+)',
             # "Series Episode 5" (assume Season 1)
@@ -85,8 +89,8 @@ class PlexNamingHelper:
                     episode = int(match.group(2))
                     return series_name, season, episode
         
-        # If no pattern matches, use the full title as series name
-        return title, 1, None
+        # If no pattern matches, return None for series (will trigger fallback)
+        return None, None, None
     
     @staticmethod
     def generate_plex_path(video: YouTubeVideo, base_dir: str, organize_by_season: bool = True) -> Tuple[str, str]:
@@ -96,22 +100,25 @@ class PlexNamingHelper:
         # Extract episode information
         series_name, season, episode = PlexNamingHelper.extract_episode_info(video.title)
         
+        # Fallback to channel name if no series detected
+        if series_name is None:
+            series_name = video.channel_title or "Unknown Channel"
+            season = None
+            episode = None
+        
         # Sanitize series name for directory
         series_dir = PlexNamingHelper.sanitize_filename(series_name)
         
         # Create directory structure
-        if organize_by_season and episode is not None:
+        if organize_by_season and season is not None and episode is not None:
             # Plex format: /Series Name/Season 01/
             season_dir = f"Season {season:02d}"
             full_dir = base_path / series_dir / season_dir
             
             # Plex filename format: Series Name - S01E05 - Episode Title.ext
-            if episode:
-                filename = f"{series_dir} - S{season:02d}E{episode:02d} - {PlexNamingHelper.sanitize_filename(video.title)}"
-            else:
-                filename = f"{series_dir} - {PlexNamingHelper.sanitize_filename(video.title)}"
+            filename = f"{series_dir} - S{season:02d}E{episode:02d} - {PlexNamingHelper.sanitize_filename(video.title)}"
         else:
-            # Simple organization: /Series Name/
+            # Simple organization: /Series Name/ or /Channel Name/
             full_dir = base_path / series_dir
             filename = PlexNamingHelper.sanitize_filename(video.title)
         

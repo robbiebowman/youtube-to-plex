@@ -175,13 +175,23 @@ def main():
     parser.add_argument("--max-videos", type=int, default=50, help="Maximum videos to check")
     parser.add_argument("--status", action="store_true", help="Show current status")
     parser.add_argument("--force-download", help="Force download a specific video URL")
-# Cache reset option removed - no longer needed
+    parser.add_argument("--channel", help="Override channel URL from config")
+    parser.add_argument("--days", type=int, help="Override upload window days from config")
     
     args = parser.parse_args()
     
     try:
         # Initialize downloader
         downloader = YouTubeToPlexDownloader(args.config)
+        
+        # Override config with command line arguments
+        if args.channel:
+            downloader.config.youtube.channel_url = args.channel
+            downloader.logger.info(f"Overriding channel URL: {args.channel}")
+        
+        if args.days:
+            downloader.config.filters.upload_window_days = args.days
+            downloader.logger.info(f"Overriding upload window: {args.days} days")
         
         if args.status:
             # Show status
